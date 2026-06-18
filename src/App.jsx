@@ -1,28 +1,39 @@
-import { useEffect } from "react";
-import { supabase } from "./supabaseClient";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Home from "./pages/Home";
+import Flowers from "./pages/Flowers";
+import Admin from "./pages/Admin";
+
 
 function App() {
 
-  useEffect(() => {
+    return (
 
-    async function loadFlowers() {
+        <BrowserRouter>
 
-      const { data, error } = await supabase
-        .from("Flowers")
-        .select("*");
+            <Routes>
 
-      console.log("Flowers:", data);
-      console.log("Error:", error);
-    }
+                <Route 
+                    path="/" 
+                    element={<Home />}
+                />
 
-    loadFlowers();
+                <Route 
+                    path="/flowers" 
+                    element={<Flowers />}
+                />
 
-  }, []);
+                <Route 
+                    path="/admin" 
+                    element={<Admin />}
+                />
 
+            </Routes>
 
-  return (
-    <h1>GardenMuse 🌷</h1>
-  );
+        </BrowserRouter>
+
+    );
 }
+
 
 export default App;
