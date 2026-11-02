@@ -2,7 +2,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
 import Flowers from "./pages/Flowers";
+import FlowersAxios from "./pages/FlowersAxios";
 import Admin from "./pages/Admin";
+
 
 
 function App() {
@@ -21,6 +23,11 @@ function App() {
                 <Route 
                     path="/flowers" 
                     element={<Flowers />}
+                />
+
+                <Route 
+                    path="/aflowers" 
+                    element={<FlowersAxios />}
                 />
 
                 <Route 
