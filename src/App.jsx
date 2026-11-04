@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
 import Flowers from "./pages/Flowers";
-import FlowersAxios from "./pages/FlowersAxios";
+import FlowersAxios from "./Pages/FlowersAxios";
 import Admin from "./pages/Admin";
 
 
