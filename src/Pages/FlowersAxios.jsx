@@ -4,12 +4,19 @@ import axios from "axios";
 const supabaseUrl = "https://xoivskauhjutqpfhehqp.supabase.co";
 const supabaseKey = "sb_publishable_TTadtabxfU7Zyk5tS1pavw_pjGZcmUe";
 
+
+
 const headers = {
     apikey: supabaseKey,
     Authorization: `Bearer ${supabaseKey}`,
 };
 
 function FlowersAxios() {
+    const adminCode = "1234"
+
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [codeInput, setCodeInput] = useState("");
+
     const [flowers, setFlowers] = useState([]);
 
     // додавання
@@ -29,6 +36,16 @@ function FlowersAxios() {
     const [editDiscount, setEditDiscount] = useState(false);
     const [editImage, setEditImage] = useState("");
     const [editNewprice, setEditNewprice] = useState("");
+
+    function checkCode(e) {
+    e.preventDefault();
+    if (codeInput === adminCode) {
+        setIsAdmin(true);
+    } else {
+        alert("Невірний код");
+    }
+    setCodeInput("");
+}
 
     useEffect(() => {
         async function loadFlowers() {
@@ -168,13 +185,20 @@ function FlowersAxios() {
                     ) : (
                         <>
                             <p>{f.name} {f.price}</p>
-                            <button onClick={() => startEdit(f)}>edit</button>
-                            <button onClick={() => deleteFlower(f.id)}>delete</button>
+                           {isAdmin && (
+                            <>
+                                <button onClick={() => startEdit(f)}>edit</button>
+                                <button onClick={() => deleteFlower(f.id)}>delete</button>
+                            </>
+                        )}
                         </>
                     )}
                 </div>
             ))}
 
+            {isAdmin ? (
+                
+                <>
             <button onClick={() => setShowForm(!showForm)}>
                 {showForm ? "Cancel" : "Add"}
             </button>
@@ -221,6 +245,20 @@ function FlowersAxios() {
                     <button type="submit">Save</button>
                 </form>
             )}
+            </>) : 
+                (
+            <form onSubmit={checkCode}>
+                <input
+                    type="password"
+                    placeholder="Код адміністратора"
+                    value={codeInput}
+                    onChange={e => setCodeInput(e.target.value)}
+                />
+                <button type="submit">Увійти</button>
+            </form>
+        )}
+            
+
             <p>changing from GitHub</p>
         </div>
     );
