@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Flowers from "./pages/Flowers";
 import FlowersAxios from "./Pages/FlowersAxios";
 import Admin from "./pages/Admin";
+import Auth from "./Pages/Auth";
 
 
 
@@ -34,6 +35,13 @@ function App() {
                     path="/admin" 
                     element={<Admin />}
                 />
+
+                <Route 
+                    path="/auth" 
+                    element={<Auth />}
+                />
+
+                
 
             </Routes>
 

@@ -1,267 +1,282 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { addToCart } from "../cart";
+import { useAuth } from "../AuthContext";
+import { Link } from "react-router-dom";
+import { supabase } from "../supabaseClient";
 
 const supabaseUrl = "https://xoivskauhjutqpfhehqp.supabase.co";
 const supabaseKey = "sb_publishable_TTadtabxfU7Zyk5tS1pavw_pjGZcmUe";
 
-
-
 const headers = {
-    apikey: supabaseKey,
-    Authorization: `Bearer ${supabaseKey}`,
+  apikey: supabaseKey,
+  Authorization: `Bearer ${supabaseKey}`,
 };
 
 function FlowersAxios() {
-    const adminCode = "1234"
+  const adminCode = "1234";
 
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [codeInput, setCodeInput] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [codeInput, setCodeInput] = useState("");
 
-    const [flowers, setFlowers] = useState([]);
+  const [flowers, setFlowers] = useState([]);
 
-    // додавання
-    const [showForm, setShowForm] = useState(false);
-    const [name, setName] = useState("");
-    const [price, setPrice] = useState("");
-    const [description, setDescription] = useState("");
-    const [discount, setDiscount] = useState(false);
-    const [image, setImage] = useState("");
-    const [newprice, setNewprice] = useState("");
+  // додавання
+  const [showForm, setShowForm] = useState(false);
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
+  const [discount, setDiscount] = useState(false);
+  const [image, setImage] = useState("");
+  const [newprice, setNewprice] = useState("");
 
-    // редагування
-    const [editingId, setEditingId] = useState(null);
-    const [editName, setEditName] = useState("");
-    const [editPrice, setEditPrice] = useState("");
-    const [editDescription, setEditDescription] = useState("");
-    const [editDiscount, setEditDiscount] = useState(false);
-    const [editImage, setEditImage] = useState("");
-    const [editNewprice, setEditNewprice] = useState("");
+  // редагування
+  const [editingId, setEditingId] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [editPrice, setEditPrice] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editDiscount, setEditDiscount] = useState(false);
+  const [editImage, setEditImage] = useState("");
+  const [editNewprice, setEditNewprice] = useState("");
 
-    function checkCode(e) {
+  const { user } = useAuth();
+
+  function checkCode(e) {
     e.preventDefault();
     if (codeInput === adminCode) {
-        setIsAdmin(true);
+      setIsAdmin(true);
     } else {
-        alert("Невірний код");
+      alert("Невірний код");
     }
     setCodeInput("");
-}
+  }
 
-    useEffect(() => {
-        async function loadFlowers() {
-            try {
-                const { data } = await axios.get(
-                    `${supabaseUrl}/rest/v1/Flowers?select=*`,
-                    { headers }
-                );
-                setFlowers(data);
-            } catch (err) {
-                console.error(err);
-            }
-        }
-        loadFlowers();
-    }, []);
-
-    async function deleteFlower(id) {
-        try {
-            await axios.delete(`${supabaseUrl}/rest/v1/Flowers?id=eq.${id}`, { headers });
-            setFlowers(prev => prev.filter(f => f.id !== id));
-        } catch (err) {
-            console.error(err);
-        }
+  useEffect(() => {
+    async function loadFlowers() {
+      try {
+        const { data } = await axios.get(
+          `${supabaseUrl}/rest/v1/Flowers?select=*`,
+          { headers },
+        );
+        setFlowers(data);
+      } catch (err) {
+        console.error(err);
+      }
     }
+    loadFlowers();
+  }, []);
 
-    async function addFlower(e) {
-        e.preventDefault();
-        try {
-            const { data } = await axios.post(
-                `${supabaseUrl}/rest/v1/Flowers`,
-                {
-                    name,
-                    price: Number(price),
-                    description,
-                    discount,
-                    image,
-                    newprice: newprice === "" ? null : Number(newprice),
-                },
-                { headers: { ...headers, Prefer: "return=representation" } }
-            );
-            setFlowers(prev => [...prev, data[0]]);
-
-            setName("");
-            setPrice("");
-            setDescription("");
-            setDiscount(false);
-            setImage("");
-            setNewprice("");
-            setShowForm(false);
-        } catch (err) {
-            console.error(err);
-        }
+  async function deleteFlower(id) {
+    try {
+      await axios.delete(`${supabaseUrl}/rest/v1/Flowers?id=eq.${id}`, {
+        headers,
+      });
+      setFlowers((prev) => prev.filter((f) => f.id !== id));
+    } catch (err) {
+      console.error(err);
     }
+  }
 
-    function startEdit(f) {
-        setEditingId(f.id);
-        setEditName(f.name ?? "");
-        setEditPrice(f.price ?? "");
-        setEditDescription(f.description ?? "");
-        setEditDiscount(f.discount ?? false);
-        setEditImage(f.image ?? "");
-        setEditNewprice(f.newprice ?? "");
+  async function addFlower(e) {
+    e.preventDefault();
+    try {
+      const { data } = await axios.post(
+        `${supabaseUrl}/rest/v1/Flowers`,
+        {
+          name,
+          price: Number(price),
+          description,
+          discount,
+          image,
+          newprice: newprice === "" ? null : Number(newprice),
+        },
+        { headers: { ...headers, Prefer: "return=representation" } },
+      );
+      setFlowers((prev) => [...prev, data[0]]);
+
+      setName("");
+      setPrice("");
+      setDescription("");
+      setDiscount(false);
+      setImage("");
+      setNewprice("");
+      setShowForm(false);
+    } catch (err) {
+      console.error(err);
     }
+  }
 
-    async function saveEdit(e) {
-        e.preventDefault();
-        try {
-            const { data } = await axios.patch(
-                `${supabaseUrl}/rest/v1/Flowers?id=eq.${editingId}`,
-                {
-                    name: editName,
-                    price: Number(editPrice),
-                    description: editDescription,
-                    discount: editDiscount,
-                    image: editImage,
-                    newprice: editNewprice === "" ? null : Number(editNewprice),
-                },
-                { headers: { ...headers, Prefer: "return=representation" } }
-            );
-            setFlowers(prev => prev.map(f => (f.id === editingId ? data[0] : f)));
-            setEditingId(null);
-        } catch (err) {
-            console.error(err);
-        }
+  function startEdit(f) {
+    setEditingId(f.id);
+    setEditName(f.name ?? "");
+    setEditPrice(f.price ?? "");
+    setEditDescription(f.description ?? "");
+    setEditDiscount(f.discount ?? false);
+    setEditImage(f.image ?? "");
+    setEditNewprice(f.newprice ?? "");
+  }
+
+  async function saveEdit(e) {
+    e.preventDefault();
+    try {
+      const { data } = await axios.patch(
+        `${supabaseUrl}/rest/v1/Flowers?id=eq.${editingId}`,
+        {
+          name: editName,
+          price: Number(editPrice),
+          description: editDescription,
+          discount: editDiscount,
+          image: editImage,
+          newprice: editNewprice === "" ? null : Number(editNewprice),
+        },
+        { headers: { ...headers, Prefer: "return=representation" } },
+      );
+      setFlowers((prev) => prev.map((f) => (f.id === editingId ? data[0] : f)));
+      setEditingId(null);
+    } catch (err) {
+      console.error(err);
     }
+  }
 
-    return (
-        <div>
-            <h1>Наші квіти</h1>
+  return (
+    <div>
+      {user ? (
+        <>
+          <Link to="/cabinet">{user.email}</Link>
+          <button onClick={() => supabase.auth.signOut()}>Вийти</button>
+        </>
+      ) : (
+        <Link to="/auth">Увійти</Link>
+      )}
+      <h1>Наші квіти</h1>
 
-            {flowers.map(f => (
-                <div key={f.id}>
-                    {editingId === f.id ? (
-                        <form onSubmit={saveEdit}>
-                            <input
-                                placeholder="Назва"
-                                value={editName}
-                                onChange={e => setEditName(e.target.value)}
-                                required
-                            />
-                            <input
-                                type="number"
-                                placeholder="Ціна"
-                                value={editPrice}
-                                onChange={e => setEditPrice(e.target.value)}
-                            />
-                            <input
-                                placeholder="descr"
-                                value={editDescription}
-                                onChange={e => setEditDescription(e.target.value)}
-                                required
-                            />
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={editDiscount}
-                                    onChange={e => setEditDiscount(e.target.checked)}
-                                />
-                                discount
-                            </label>
-                            <input
-                                placeholder="image"
-                                value={editImage}
-                                onChange={e => setEditImage(e.target.value)}
-                            />
-                            <input
-                                type="number"
-                                placeholder="newprice"
-                                value={editNewprice}
-                                onChange={e => setEditNewprice(e.target.value)}
-                            />
-                            <button type="submit">Save</button>
-                            <button type="button" onClick={() => setEditingId(null)}>
-                                Cancel
-                            </button>
-                        </form>
-                    ) : (
-                        <>
-                            <p>{f.name} {f.price}</p>
-                           {isAdmin && (
-                            <>
-                                <button onClick={() => startEdit(f)}>edit</button>
-                                <button onClick={() => deleteFlower(f.id)}>delete</button>
-                            </>
-                        )}
-                        </>
-                    )}
-                </div>
-            ))}
-
-            {isAdmin ? (
-                
-                <>
-            <button onClick={() => setShowForm(!showForm)}>
-                {showForm ? "Cancel" : "Add"}
-            </button>
-
-            {showForm && (
-                <form onSubmit={addFlower}>
-                    <input
-                        placeholder="Назва"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        required
-                    />
-                    <input
-                        type="number"
-                        placeholder="Ціна"
-                        value={price}
-                        onChange={e => setPrice(e.target.value)}
-                    />
-                    <input
-                        placeholder="descr"
-                        value={description}
-                        onChange={e => setDescription(e.target.value)}
-                        required
-                    />
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={discount}
-                            onChange={e => setDiscount(e.target.checked)}
-                        />
-                        discount
-                    </label>
-                    <input
-                        placeholder="image"
-                        value={image}
-                        onChange={e => setImage(e.target.value)}
-                    />
-                    <input
-                        type="number"
-                        placeholder="newprice"
-                        value={newprice}
-                        onChange={e => setNewprice(e.target.value)}
-                    />
-                    <button type="submit">Save</button>
-                </form>
-            )}
-            </>) : 
-                (
-            <form onSubmit={checkCode}>
+      {flowers.map((f) => (
+        <div key={f.id}>
+          {editingId === f.id ? (
+            <form onSubmit={saveEdit}>
+              <input
+                placeholder="Назва"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Ціна"
+                value={editPrice}
+                onChange={(e) => setEditPrice(e.target.value)}
+              />
+              <input
+                placeholder="descr"
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                required
+              />
+              <label>
                 <input
-                    type="password"
-                    placeholder="Код адміністратора"
-                    value={codeInput}
-                    onChange={e => setCodeInput(e.target.value)}
+                  type="checkbox"
+                  checked={editDiscount}
+                  onChange={(e) => setEditDiscount(e.target.checked)}
                 />
-                <button type="submit">Увійти</button>
+                discount
+              </label>
+              <input
+                placeholder="image"
+                value={editImage}
+                onChange={(e) => setEditImage(e.target.value)}
+              />
+              <input
+                type="number"
+                placeholder="newprice"
+                value={editNewprice}
+                onChange={(e) => setEditNewprice(e.target.value)}
+              />
+              <button type="submit">Save</button>
+              <button type="button" onClick={() => setEditingId(null)}>
+                Cancel
+              </button>
             </form>
-        )}
-            
-
-            <p>changing from GitHub</p>
+          ) : (
+            <>
+              <p>
+                {f.name} {f.price}
+              </p>
+              {user && <button onClick={() => addToCart(f.id)}>В кошик</button>}
+              {isAdmin && (
+                <>
+                  <button onClick={() => startEdit(f)}>edit</button>
+                  <button onClick={() => deleteFlower(f.id)}>delete</button>
+                </>
+              )}
+            </>
+          )}
         </div>
-    );
+      ))}
+
+      {isAdmin ? (
+        <>
+          <button onClick={() => setShowForm(!showForm)}>
+            {showForm ? "Cancel" : "Add"}
+          </button>
+
+          {showForm && (
+            <form onSubmit={addFlower}>
+              <input
+                placeholder="Назва"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Ціна"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+              <input
+                placeholder="descr"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+              />
+              <label>
+                <input
+                  type="checkbox"
+                  checked={discount}
+                  onChange={(e) => setDiscount(e.target.checked)}
+                />
+                discount
+              </label>
+              <input
+                placeholder="image"
+                value={image}
+                onChange={(e) => setImage(e.target.value)}
+              />
+              <input
+                type="number"
+                placeholder="newprice"
+                value={newprice}
+                onChange={(e) => setNewprice(e.target.value)}
+              />
+              <button type="submit">Save</button>
+            </form>
+          )}
+        </>
+      ) : (
+        <form onSubmit={checkCode}>
+          <input
+            type="password"
+            placeholder="Код адміністратора"
+            value={codeInput}
+            onChange={(e) => setCodeInput(e.target.value)}
+          />
+          <button type="submit">Увійти</button>
+        </form>
+      )}
+
+      <p>changing from GitHub</p>
+    </div>
+  );
 }
 
 export default FlowersAxios;
