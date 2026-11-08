@@ -5,50 +5,26 @@ import Flowers from "./pages/Flowers";
 import FlowersAxios from "./Pages/FlowersAxios";
 import Admin from "./pages/Admin";
 import Auth from "./Pages/Auth";
-
-
+import Cabinet from "./Pages/Cabinet";
 
 function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
 
-    return (
+        <Route path="/flowers" element={<Flowers />} />
 
-        <BrowserRouter>
+        <Route path="/aflowers" element={<FlowersAxios />} />
 
-            <Routes>
+        <Route path="/admin" element={<Admin />} />
 
-                <Route 
-                    path="/" 
-                    element={<Home />}
-                />
+        <Route path="/auth" element={<Auth />} />
 
-                <Route 
-                    path="/flowers" 
-                    element={<Flowers />}
-                />
-
-                <Route 
-                    path="/aflowers" 
-                    element={<FlowersAxios />}
-                />
-
-                <Route 
-                    path="/admin" 
-                    element={<Admin />}
-                />
-
-                <Route 
-                    path="/auth" 
-                    element={<Auth />}
-                />
-
-                
-
-            </Routes>
-
-        </BrowserRouter>
-
-    );
+        <Route path="/cabinet" element={<Cabinet />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
-
 
 export default App;

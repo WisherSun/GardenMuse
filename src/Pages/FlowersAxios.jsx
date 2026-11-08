@@ -201,7 +201,17 @@ function FlowersAxios() {
               <p>
                 {f.name} {f.price}
               </p>
-              {user && <button onClick={() => addToCart(f.id)}>В кошик</button>}
+              {user && (
+                <button
+                  onClick={async () => {
+                    const { error } = await addToCart(f.id);
+                    if (error) alert(error.message);
+                    else alert("Додано в кошик");
+                  }}
+                >
+                  В кошик
+                </button>
+              )}
               {isAdmin && (
                 <>
                   <button onClick={() => startEdit(f)}>edit</button>
