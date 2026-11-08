@@ -7,6 +7,7 @@ function Flowers() {
             <h1>Наші квіти</h1>
 
             <FlowerList />
+            <p>From commit from GitHub</p>
 
         </div>
     );
